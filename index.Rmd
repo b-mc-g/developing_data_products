@@ -1,0 +1,60 @@
+---
+title: "DDP - Wk2 - PA 1"
+author: "b m g"
+date: "6/11/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Assignment : Map Example using leaflet in R. Population levels 2015 for the top 20 cities and towns in Germany.
+
+## Setting up libraries
+
+```{r}
+library(readr)
+library(leaflet)
+```
+## Reading in Data
+
+The German population data for 2015 can be found here
+https://www.destatis.de/DE/ZahlenFakten/LaenderRegionen/Regionales/Gemeindeverzeichnis/Administrativ/Aktuell/05Staedte.html
+
+Latitude and longtitude data for the top 20 towns and cities can be found here http://www.tageo.com/index-e-gm-cities-DE.htm
+
+The URL data was gathered manually from Wikipedia and entered into the csv file. The csv file is locaated in the Data directory in the working directory.
+
+```{r data}
+pop_data <- read.csv("./Data/DE_Pop_2015.csv", header=TRUE, sep=";")
+View(pop_data)
+```
+
+## Project the data onto a leaflet generated Map
+
+The data is projected onto a leaflet generated map where marker diameter is currently not proportional to population. Marker diameter is scalled by dividing the square root of the population by 1,000 (one thousand).
+
+The popups show the city name, population and URL for further information. The URL is not active at this time.
+
+```{r}
+mymap <- pop_data %>% 
+                  leaflet() %>% 
+                  addTiles() %>% 
+                  addProviderTiles(providers$OpenStreetMap) %>% # added as per Forum week 2
+                  addCircleMarkers(
+                        lat=pop_data$Lat, lng=pop_data$Long, weight=5,
+                        #radius=as.numeric(as.character(pop_data$Pop)),
+                        popup = paste(as.character(pop_data$Name), 
+                        "<BR>Population: ", pop_data$Pop, 
+                        "<BR>", as.character(pop_data$URL)),
+                  clusterOptions = markerClusterOptions()
+                                    )
+                  
+mymap # plot the map to the viewer and knitr output file
+```
+
+## Aknowledgements
+
+1. German census infomation from official government site https://www.destatis.de/DE/ZahlenFakten/LaenderRegionen/Regionales/Gemeindeverzeichnis/Administrativ/Aktuell/05Staedte.html
+
+2. The population data was taken from following site http://www.tageo.com/index-e-gm-cities-DE.htm
